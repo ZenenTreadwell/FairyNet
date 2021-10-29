@@ -64,7 +64,7 @@ print(f'Found {len(nodes)} peer(s)!')
 class StreamRequestCompressor(socketserver.StreamRequestHandler):
     def handle(self):
         for node in nodes:
-            xbee.send_data_async(node, 'PACKET_START'.encode('utf-8'))
+            xbee.send_data_async(node, 'REQ_START'.encode('utf-8'))
 
         data = self.rfile.readline().strip()
         while data:
@@ -77,7 +77,7 @@ class StreamRequestCompressor(socketserver.StreamRequestHandler):
             data = self.rfile.readline().strip()
 
         for node in nodes:
-            xbee.send_data_async(node, 'PACKET_END'.encode('utf-8'))
+            xbee.send_data_async(node, 'REQ_END'.encode('utf-8'))
 
 #class RequestCompressor(socketserver.BaseRequestHandler):
 #    def handle(self):
