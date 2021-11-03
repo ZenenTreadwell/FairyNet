@@ -62,7 +62,8 @@ def rcv_callback(xbee_message):
     data = xbee_message.data.decode('utf-8')
     msg = Message(data, node_id)
     print(msg.toDiv())
-    socketio.emit('resp', {'message': data, 'username': node_id}, callback=msg_rcv)
+    socketio.emit('resp', {'message': parseBytes(data), 'username': node_id,
+                           'broadcast': xbee_message.is_broadcast}, callback=msg_rcv)
 
 xbee.add_data_received_callback(rcv_callback)
 
@@ -73,7 +74,8 @@ def chat():
 @app.route('/send/<message>', methods=['GET','POST'])
 def send_msg(message):
     xbee.send_data_broadcast(message.encode('utf-8'))
-    socketio.emit('resp', {'message': parseBytes(message), 'username': myNode.name + ' (me)'}, callback=msg_rcv)
+    socketio.emit('resp', {'message': parseBytes(message), 'username': myNode.name + ' (me)',
+                           'broadcast': True}, callback=msg_rcv)
     return ('Sent!')
 
 
@@ -83,7 +85,8 @@ def send_dm(node_address, message):
         print(f'{str(node.get_64bit_addr())} vs. {str(node_address)}')
         if (str(node.get_64bit_addr()) == str(node_address)):
             xbee.send_data(node, message.encode('utf-8'))
-            socketio.emit('resp', {'message': parseBytes(message), 'username': f'{myNode.name} to {node.get_node_id()}'}, callback=msg_rcv)
+            socketio.emit('resp', {'message': parseBytes(message), 'username': f'{myNode.name} to {node.get_node_id()}',
+                                   'broadcast': True}, callback=msg_rcv)
             return ('Sent!')
     return ('Failed to Send')
 
