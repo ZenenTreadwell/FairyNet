@@ -14,13 +14,15 @@ import multiprocessing as mp
 
 # Each Mesh node needs one server socket for receiving requests
 sock = socket.socket()
-sock.bind((socket.gethostname(), 1618))
+sock.bind((socket.gethostbyname('localhost'), 1618))
 sock.listen()
 
 # ser = serial.Serial('/dev/ttyUSB0', 9600)
 # ser.close()
 
-xbee = XBeeDevice('/dev/ttyUSB0', 9600)
+# xbee = XBeeDevice('/dev/ttyUSB0', 9600)
+xbee = XBeeDevice('/dev/cu.usbserial-AG0JYQVE', 9600)
+
 xbee.set_sync_ops_timeout(10)
 # print('XBee Attributes')
 # print(dir(xbee))

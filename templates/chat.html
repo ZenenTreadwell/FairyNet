@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FairyNet</title>
+  </head>
+  <body>
+    <h3 style='color: #ddd; font-size: 24px;'>Waiting for messages...</h3>
+    <div class="message_holder"></div>
+
+    <form action="" id='msgform' method="POST">
+      <label>Send to:</label>
+      <select id='user' form='msgform'>
+        <option value="">Everyone</option>
+        {% for node in nodes %}
+        <option value="{{node.address}}">{{node.name}}</option>
+        {% endfor %}
+      </select>
+      <input type="text" class="message" placeholder="Messages"/>
+      <input type="submit">
+    </form>
+    <script src="{{url_for('static', filename='jquery-3.6.0.min.js')}}"></script>
+    <script src="{{url_for('static', filename='socket.io.min.js')}}"></script>
+    <script type='text/javascript'>
+      const sock = io.connect('http://' + document.domain + ':' + location.port);
+            sock.on('connect', () => {
+                    sock.emit('msg', {
+                            data: 'User Connected'
+                          })
+                    const form = $('form').on('submit', (e) => {
+                            e.preventDefault()
+                            let utf8Encode = new TextEncoder();
+                            let address = $( '#msgform option:selected' ).val()
+                            let message = utf8Encode.encode($( 'input.message' ).val())
+                            if (address === "") {
+                                    $.getJSON('/send/'+message)
+                                  }
+                            else {
+                                    $.getJSON('/dm/'+address+'/'+message)
+                            sock.emit('msg', { address, message })
+                            $( 'input.message' ).val('').focus()
+                          })
+                  })
+            sock.on('resp', (msg) => {
+                    console.log(msg);
+                    if (msg?.username) {
+                            $('h3').remove()
+                            $( 'div.message_holder').append(`<div><b>${msg.username}: </b>${msg.message}</div>`)
+                          }
+                  })
+    </script>
+  </body>
+</html>
