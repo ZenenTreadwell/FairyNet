@@ -36,6 +36,7 @@
                                   }
                             else {
                                     $.getJSON('/dm/'+address+'/'+message)
+                                  }
                             sock.emit('msg', { address, message })
                             $( 'input.message' ).val('').focus()
                           })
